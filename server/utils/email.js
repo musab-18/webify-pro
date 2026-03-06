@@ -1,34 +1,22 @@
-const nodemailer = require('nodemailer');
-
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
-    requireTLS: true,
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    },
-    tls: {
-        rejectUnauthorized: false
-    }
-});
+const axios = require('axios');
 
 const sendEmail = async (subject, text) => {
-    const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: 'musabiftikhar44@gmail.com', // Notifying the user
-        subject: subject,
-        text: text
-    };
-
     try {
-        await transporter.sendMail(mailOptions);
-        console.log('Email sent successfully');
+        await axios.post('https://api.emailjs.com/api/v1.0/email/send', {
+            service_id: process.env.EMAILJS_SERVICE_ID,
+            template_id: process.env.EMAILJS_TEMPLATE_ID,
+            user_id: process.env.EMAILJS_PUBLIC_KEY,
+            template_params: {
+                subject: subject,
+                message: text,
+                to_name: 'Webify Pro Admin',
+            }
+        });
+        console.log('Email sent successfully via EmailJS API!');
     } catch (error) {
-        console.error('Error sending email (Render blocks SMTP on free tier):', error.message);
-        // Do NOT throw error here. We want the form to return 'Success' 
-        // and save to MongoDB, even if Render blocks the email notification.
+        console.error('Error sending email via EmailJS:', error.response?.data || error.message);
+        // We do not throw the error because we still want the DB save to succeed 
+        // even if the email API quota is reached or fails.
     }
 };
 
