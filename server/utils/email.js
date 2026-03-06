@@ -26,8 +26,9 @@ const sendEmail = async (subject, text) => {
         await transporter.sendMail(mailOptions);
         console.log('Email sent successfully');
     } catch (error) {
-        console.error('Error sending email:', error);
-        throw error; // Force the request to fail instead of hanging
+        console.error('Error sending email (Render blocks SMTP on free tier):', error.message);
+        // Do NOT throw error here. We want the form to return 'Success' 
+        // and save to MongoDB, even if Render blocks the email notification.
     }
 };
 
