@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Order = require('../models/Order');
-const sendEmail = require('../utils/email');
+
 
 // POST a new order
 router.post('/', async (req, res) => {
@@ -9,12 +9,7 @@ router.post('/', async (req, res) => {
         const newOrder = new Order(req.body);
         const savedOrder = await newOrder.save();
 
-        // Fire off the email notification asynchronously without awaiting/blocking.
-        // Any errors inside sendEmail are caught and logged so this route won't crash.
-        sendEmail(
-            'New Order Received - Webify Pro',
-            `You have a new order!\n\nService: ${savedOrder.service}\nCustomer: ${savedOrder.customerName}\nEmail: ${savedOrder.customerEmail}\nPhone: ${savedOrder.customerPhone}\nDetails: ${savedOrder.details}`
-        );
+
 
 
 
