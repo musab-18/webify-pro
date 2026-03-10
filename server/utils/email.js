@@ -1,41 +1,20 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
 const sendEmail = async (subject, text) => {
     try {
-        const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 587,
-            secure: false, // Use STARTTLS
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
-            },
-            tls: {
-                rejectUnauthorized: false
-            },
-            // Force IPv4 to avoid IPv6 connection issues
-            family: 4
-        });
+        const resend = new Resend(process.env.RESEND_API_KEY);
 
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
+        await resend.emails.send({
+            from: 'Webify Pro <onboarding@resend.dev>',
             to: process.env.EMAIL_USER,
             subject: subject,
             text: text
-        };
+        });
 
-        // Set a timeout for email sending (8 seconds to stay under Vercel's 10s limit)
-        await Promise.race([
-            transporter.sendMail(mailOptions),
-            new Promise((_, reject) => 
-                setTimeout(() => reject(new Error('Email timeout')), 8000)
-            )
-        ]);
-        
-        console.log('Email sent successfully via Nodemailer!');
+        console.log('Email sent successfully via Resend!');
     } catch (error) {
-        console.error('Error sending email via Nodemailer:', error.message);
-        // We do not throw the error because we still want the DB save to succeed
+        console.error('Error sending email via Resend:', error.message);
+        // We do not throw the error so DB saves still succeed
     }
 };
 
