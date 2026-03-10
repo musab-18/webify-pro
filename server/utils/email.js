@@ -8,14 +8,13 @@ const nodemailer = require('nodemailer');
 const sendEmail = async (subject, text) => {
     try {
         const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 465,
-            secure: true, // true for 465, false for other ports
+            service: 'gmail',
+            port: 587,
+            secure: false, // false for 587 (uses STARTTLS)
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS
             },
-            // TLS settings to help prevent connection drops in strict environments like Vercel/Render
             tls: {
                 rejectUnauthorized: false
             }
