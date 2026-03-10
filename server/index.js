@@ -31,6 +31,12 @@ app.get('/', (req, res) => {
     res.send('Webify Pro API is running');
 });
 
+// Version check - tells us exactly which code Render deployed
+app.get('/version', (req, res) => {
+    res.json({ version: 'RESEND_v2', emailLib: 'resend', timestamp: '2026-03-10' });
+});
+
+
 // Start server
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
