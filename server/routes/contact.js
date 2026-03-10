@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Message = require('../models/Message');
-
+const sendEmail = require('../utils/email');
 
 // POST a new message
 router.post('/', async (req, res) => {
@@ -9,9 +9,11 @@ router.post('/', async (req, res) => {
         const newMessage = new Message(req.body);
         const savedMessage = await newMessage.save();
 
-
-
-
+        // Send email in background - does not block the response
+        sendEmail(
+            'New Contact Message - Webify Pro',
+            `New message!\n\nFrom: ${savedMessage.name}\nEmail: ${savedMessage.email}\nPhone: ${savedMessage.phone}\nSubject: ${savedMessage.subject}\nMessage: ${savedMessage.message}`
+        );
 
         res.status(201).json(savedMessage);
     } catch (err) {
