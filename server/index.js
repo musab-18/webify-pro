@@ -1,11 +1,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const dns = require('dns');
+
 require('dotenv').config();
 
-// Force IPv4 DNS resolution for Nodemailer bypass
-dns.setDefaultResultOrder('ipv4first');
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;

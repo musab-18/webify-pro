@@ -9,11 +9,13 @@ router.post('/', async (req, res) => {
         const newMessage = new Message(req.body);
         const savedMessage = await newMessage.save();
 
-        // Send notification
-        await sendEmail(
+        // Fire off the email notification asynchronously without awaiting/blocking.
+        sendEmail(
             'New Contact Message - Webify Pro',
             `You have a new message!\n\nFrom: ${savedMessage.name}\nEmail: ${savedMessage.email}\nPhone: ${savedMessage.phone}\nSubject: ${savedMessage.subject}\nMessage: ${savedMessage.message}`
         );
+
+
 
         res.status(201).json(savedMessage);
     } catch (err) {

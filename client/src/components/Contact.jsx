@@ -18,6 +18,7 @@ const Contact = () => {
         try {
             const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
             await axios.post(`${API_URL}/api/contact`, formData);
+
             setStatus('success');
             setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
             setTimeout(() => setStatus('idle'), 5000);

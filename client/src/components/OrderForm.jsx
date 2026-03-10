@@ -18,6 +18,7 @@ const OrderForm = () => {
         try {
             const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
             await axios.post(`${API_URL}/api/orders`, formData);
+
             setStatus('success');
             setFormData({ service: 'Web Development', customerName: '', customerEmail: '', customerPhone: '', details: '' });
             setTimeout(() => setStatus('idle'), 5000);
