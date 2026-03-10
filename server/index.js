@@ -1,16 +1,21 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const dns = require('dns');
 
 require('dotenv').config();
 
-
+// Force IPv4 DNS resolution to prevent IPv6 connection issues
+dns.setDefaultResultOrder('ipv4first');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: process.env.FRONTEND_URL || '*', // Set FRONTEND_URL in Vercel env vars
+    credentials: true
+}));
 app.use(express.json());
 
 // MongoDB Connection

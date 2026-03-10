@@ -1,44 +1,41 @@
 const nodemailer = require('nodemailer');
 
-/**
- * Robust email sending utility that won't crash the server on failure.
- * @param {string} subject - Email subject
- * @param {string} text - Email body
- */
 const sendEmail = async (subject, text) => {
     try {
         const transporter = nodemailer.createTransport({
-            service: 'gmail',
+            host: 'smtp.gmail.com',
             port: 587,
-            secure: false, // false for 587 (uses STARTTLS)
+            secure: false, // Use STARTTLS
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS
             },
             tls: {
                 rejectUnauthorized: false
-            }
+            },
+            // Force IPv4 to avoid IPv6 connection issues
+            family: 4
         });
-
-        // Verify connection configuration (optional, but good for debugging logs)
-        // await transporter.verify();
 
         const mailOptions = {
             from: process.env.EMAIL_USER,
-            to: process.env.EMAIL_USER, // Sending to admin
+            to: process.env.EMAIL_USER,
             subject: subject,
             text: text
         };
 
-        const info = await transporter.sendMail(mailOptions);
-        console.log(`Email sent: ${info.messageId}`);
-        return true;
+        // Set a timeout for email sending (8 seconds to stay under Vercel's 10s limit)
+        await Promise.race([
+            transporter.sendMail(mailOptions),
+            new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Email timeout')), 8000)
+            )
+        ]);
+        
+        console.log('Email sent successfully via Nodemailer!');
     } catch (error) {
-        // We log the error but DO NOT throw it.
-        // This ensures the calling function (like a POST route) continues executing
-        // and returns a 201/200 success to the user instead of a 500 error.
-        console.error('Nodemailer Error. Email delivery failed, but proceeding with application flow:', error.message);
-        return false;
+        console.error('Error sending email via Nodemailer:', error.message);
+        // We do not throw the error because we still want the DB save to succeed
     }
 };
 
